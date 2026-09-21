@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "grpore"
+version = "0.1.0"
+description = "A tiny, fully-verifiable GRPO / REINFORCE / DPO comparison lab on an RPN puzzle env."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Lesereingrape" }]
+keywords = ["grpo", "rlhf", "reinforce", "dpo", "policy-optimization", "llm"]
+dependencies = ["torch>=2.0"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff>=0.14,<0.15"]
+
+[project.scripts]
+grpore = "grpore.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+src = ["src"]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I", "UP", "RUF", "B", "C4", "SIM", "FURB"]
+ignore = ["SIM105"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
