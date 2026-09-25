@@ -8,8 +8,9 @@ Group Relative Policy Optimization (GRPO) is the algorithm behind DeepSeek-R1's
 reasoning training: it drops PPO's learned critic and instead normalizes reward
 *within a group of rollouts for the same prompt*. That idea is easy to describe
 and hard to feel. This repo makes it feelable: a ~15k-parameter GRU policy plays a
-Reverse-Polish-Notation number game, and three arms train on it in **CPU seconds**
-so every number in this README was measured on a laptop, not copied from a paper.
+Reverse-Polish-Notation number game, and the slowest of its three arms trains on it
+in **about two CPU minutes**, so every number in this README was measured on a
+laptop rather than copied from a paper.
 
 ```
 prompt:  numbers=(5, 3, 2)  target=8
@@ -55,8 +56,9 @@ python experiments/make_report.py --write
 
 `grpore ablate` writes the raw per-seed reward/accuracy curves plus the config and the
 environment they were measured under, so the table below is reproducible with one
-command — and `--out /tmp/again.json` sends a rerun to a scratch path so you can diff it
-against the committed artifact instead of overwriting it.
+command — and `--out again-check.json` sends a rerun to a scratch file so you can diff
+it against the committed artifact instead of overwriting it (a relative path: Git-Bash
+rewrites `/tmp/...` arguments, Python does not).
 
 ## Results (measured, not illustrative)
 
@@ -116,7 +118,8 @@ pytest -q          # evaluator, advantages, policy, the three arms, and the
 
 This is a *pedagogical reproduction harness*, not a state-of-the-art result. The
 policy is a GRU, the task is arithmetic on three digits, and accuracy is single-
-digit-percentages because the model is deliberately tiny and training is CPU-short.
+digit-percentages because the model is deliberately tiny and the budget is 120
+iterations.
 The value is that the **three algorithms run on identical footing** and the
 numbers in the table above are exactly what the code prints — no hidden tuning,
 no paper numbers pasted in.
@@ -127,13 +130,15 @@ them byte for byte, and re-derives each table cell from the raw runs so a stale 
 cannot survive inside regenerated prose), and the artifact itself carries the shared
 config, the per-seed curves and the measuring environment
 (`tests/test_artifact_is_internally_consistent.py` recomputes every summary field from
-those curves). `tests/test_readme_size_claims.py` measures the hand-written
-"~15k-parameter" and "~560 lines" figures against the code, because those are the two
-numbers the generator cannot fix for you.
+those curves). `tests/test_readme_size_claims.py` measures the hand-written figures the
+generator cannot fix for you - "~15k-parameter", "~560 lines", the two-CPU-minute
+blurb and the 120-iteration budget - against the code and the artifact.
 
 A rerun reproduces the artifact field for field except `runtime_sec`, inside the
 environment the JSON records — this was checked by writing a second run to a scratch
-path (`grpore ablate --out /tmp/again.json`) and diffing it against the committed file.
+path (`grpore ablate --out again-check.json`; a relative path, because Git-Bash
+rewrites a `/tmp/...` argument while Python would open it against the drive root) and
+diffing it against the committed file.
 Wall-clock is the one column that is *not* portable: it moved by a third on the same
 machine while other training jobs shared the CPU, which is why it is reported per run
 rather than as a speed claim.
