@@ -2,6 +2,10 @@
 
     grpore train   --algo grpo --seed 0
     grpore ablate  --seeds 0 1 2 --out results/ablation.json
+
+``ablate --out`` may point at a scratch path, which is how the README's
+reproducibility claim gets checked: rerun, then diff the two artifacts field for
+field without touching the committed one.
 """
 
 from __future__ import annotations
@@ -11,6 +15,7 @@ import json
 import time
 from pathlib import Path
 
+from .study import build_artifact, published_config
 from .train import PUBLISHED_ITERS, RunConfig, run_algo, to_jsonl
 
 ALGOS = ("grpo", "reinforce", "dpo")
@@ -43,6 +48,7 @@ def cmd_train(args: argparse.Namespace) -> int:
 
 def cmd_ablate(args: argparse.Namespace) -> int:
     results = []
+    t_start = time.time()
     for algo in ALGOS:
         for seed in args.seeds:
             cfg = RunConfig(algo=algo, seed=seed, iters=args.iters)
@@ -54,9 +60,11 @@ def cmd_ablate(args: argparse.Namespace) -> int:
             results.append(row)
             print(f"[{algo:9s} seed={seed}] reward={row['final_reward']:.3f} "
                   f"acc={row['final_acc']:.3f} {row['seconds']}s")
+    artifact = build_artifact(results, published_config(args.iters),
+                              time.time() - t_start)
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(json.dumps(results, indent=2), encoding="utf-8")
+    out.write_text(json.dumps(artifact, indent=2), encoding="utf-8")
     print(f"\nwrote {out}")
     return 0
 
