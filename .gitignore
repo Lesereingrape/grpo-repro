@@ -8,3 +8,6 @@ dist/
 .pytest_cache/
 .ruff_cache/
 .DS_Store
+
+# scratch rerun from the documented verification snippet
+again-check.json
