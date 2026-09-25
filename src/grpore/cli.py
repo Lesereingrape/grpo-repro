@@ -11,7 +11,7 @@ import json
 import time
 from pathlib import Path
 
-from .train import RunConfig, run_algo, to_jsonl
+from .train import PUBLISHED_ITERS, RunConfig, run_algo, to_jsonl
 
 ALGOS = ("grpo", "reinforce", "dpo")
 
@@ -68,13 +68,13 @@ def build_parser() -> argparse.ArgumentParser:
     tp = sub.add_parser("train", help="run a single algorithm arm")
     tp.add_argument("--algo", choices=ALGOS, default="grpo")
     tp.add_argument("--seed", type=int, default=0)
-    tp.add_argument("--iters", type=int, default=60)
+    tp.add_argument("--iters", type=int, default=PUBLISHED_ITERS)
     tp.add_argument("--jsonl", default=None)
     tp.set_defaults(func=cmd_train)
 
     ab = sub.add_parser("ablate", help="run every arm across seeds")
     ab.add_argument("--seeds", type=int, nargs="+", default=[0, 1, 2])
-    ab.add_argument("--iters", type=int, default=60)
+    ab.add_argument("--iters", type=int, default=PUBLISHED_ITERS)
     ab.add_argument("--out", default="results/ablation.json")
     ab.set_defaults(func=cmd_ablate)
     return ap

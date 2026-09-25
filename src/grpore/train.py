@@ -26,12 +26,16 @@ from .adv import group_relative, mean_baseline
 from .env import Prompt, reward, sample_prompts
 from .policy import Policy, prompt_vector, tokens_to_str
 
+#: Iteration budget the committed ``results/ablation.json`` curves were measured
+#: at, and therefore what a bare ``grpore train`` should reproduce.
+PUBLISHED_ITERS = 120
+
 
 @dataclass
 class RunConfig:
     algo: str = "grpo"
     seed: int = 0
-    iters: int = 60
+    iters: int = PUBLISHED_ITERS
     prompts_per_iter: int = 16
     group_size: int = 8          # GRPO rollouts per prompt
     inner_epochs: int = 2        # PPO-style reuse of each rollout batch
